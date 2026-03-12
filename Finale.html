@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reserva | Potinho do GOAT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Satisfy&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #E96A8D;
+            --dark: #4A3228;
+            --bg-base: #FFF4E8;
+            --card-bg: #FFFFFF;
+            --gradient: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);
+            --accent: #FF85A2;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body { 
+            background-color: var(--bg-base); 
+            color: var(--dark); 
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 4rem 1.5rem 5rem;
+            background: var(--gradient);
+            color: white;
+            text-align: center;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        header h1 { font-family: 'Satisfy', cursive; font-size: 3.5rem; }
+        header p { font-size: 0.8rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+
+        .container { max-width: 500px; margin: -40px auto 0; padding: 0 1.2rem 3rem; }
+
+        /* Grid de Sabores sem imagem */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 20px 10px;
+            text-align: center;
+            box-shadow: 8px 8px 16px #ede4db, -4px -4px 12px #ffffff;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 120px;
+            border: 2px solid transparent;
+        }
+
+        .card.active { border-color: var(--primary); background: #fff5f7; transform: scale(1.05); }
+
+        .card h3 { font-size: 1.1rem; margin-bottom: 5px; color: var(--primary); }
+        .card p.ingredientes { font-size: 0.7rem; color: #888; line-height: 1.2; }
+        .price-tag { font-weight: 800; font-size: 1rem; margin-top: 8px; color: var(--dark); }
+
+        .order-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem 1.5rem;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1.2rem;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 20px;
+            background: #f2f2f2;
+            box-shadow: inset 4px 4px 8px #e6e6e6, inset -4px -4px 8px #ffffff;
+            font-size: 1rem;
+        }
+
+        .btn-order {
+            background: var(--dark);
+            color: white;
+            border: none;
+            padding: 1.4rem;
+            border-radius: 25px;
+            width: 100%;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Modal / Pop-up */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 35px;
+            text-align: center;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 320px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-content h2 { color: #2ecc71; margin-bottom: 10px; }
+        .modal-content p { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
+
+        footer { text-align: center; padding: 2.5rem; opacity: 0.4; font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Potinho do GOAT</h1>
+    <p>reserva oficial</p>
+</header>
+
+<div class="container">
+    <div class="menu-grid">
+        <div class="card" id="card-Brigadeiro" onclick="toggleFlavor('Brigadeiro')">
+            <h3>Brigadeiro</h3>
+            <p class="ingredientes">Chocolate 50%, granulado e amor</p>
+            <p class="price-tag">R$ 10,00</p>
+        </div>
+        <div class="card" id="card-Ninho" onclick="toggleFlavor('Ninho')">
+            <h3>Ninho</h3>
+            <p class="ingredientes">Leite ninho original e creme leve</p>
+            <p class="price-tag">R$ 10,00</p>
+        </div>
+        <div class="card" id="card-Casado" onclick="toggleFlavor('Casado')">
+            <h3>Casadinho</h3>
+            <p class="ingredientes">O melhor dos dois mundos misturados</p>
+            <p class="price-tag">R$ 10,00</p>
+        </div>
+        <div class="card" id="card-Maracujá" onclick="toggleFlavor('Maracujá')">
+            <h3>Maracujá</h3>
+            <p class="ingredientes">Mousse artesanal com a fruta fresca</p>
+            <p class="price-tag">R$ 10,00</p>
+        </div>
+    </div>
+
+    <div class="order-section" id="encomenda">
+        <form id="cakeForm">
+            <input type="text" id="nome" placeholder="Seu Nome" required maxlength="20">
+            <input type="text" id="turma" placeholder="Sua Sala (Ex: 3ºA)" required maxlength="4">
+            
+            <div style="display: none;">
+                <input type="checkbox" name="sabor" value="Brigadeiro">
+                <input type="checkbox" name="sabor" value="Ninho">
+                <input type="checkbox" name="sabor" value="Casado">
+                <input type="checkbox" name="sabor" value="Maracujá">
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-order">RESERVAR AGORA</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <h2>Tudo Pronto!</h2>
+        <p>Estamos te levando para o WhatsApp para confirmar sua reserva.</p>
+        <div style="font-size: 3rem;">✨</div>
+    </div>
+</div>
+
+<footer>&copy; 2024 Martelo Dev &bull; Potinho do GOAT</footer>
+
+<script>
+    const MEU_WHATSAPP = "5511999999999"; 
+
+    function toggleFlavor(sabor) {
+        const cb = document.querySelector(`input[value="${sabor}"]`);
+        const card = document.getElementById(`card-${sabor}`);
+        
+        cb.checked = !cb.checked;
+        card.classList.toggle('active'); // Adiciona/remove brilho no card
+    }
+
+    document.getElementById('cakeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const nome = document.getElementById('nome').value.trim();
+        const turma = document.getElementById('turma').value.trim();
+        const selecionados = Array.from(document.querySelectorAll('input[name="sabor"]:checked'))
+                                  .map(cb => cb.value);
+
+        if (selecionados.length === 0) {
+            alert("Selecione pelo menos um sabor clicando nos cards acima!");
+            return;
+        }
+
+        // Mostra o Pop-up
+        const modal = document.getElementById('modal');
+        modal.style.display = 'flex';
+
+        confetti({ 
+            particleCount: 150, spread: 70, origin: { y: 0.8 },
+            colors: ['#E96A8D', '#ffffff', '#FFD700']
+        });
+
+        const saboresTxt = selecionados.join(", ");
+        const mensagem = `Ola sou %0A%0A` +
+                         `${nome}%0A` +
+                         `Minha sala é ${turma}%0A` +
+                         `Itens: ${saboresTxt}%0A%0A` +
+                         `Fiz a reserva pelo site`;
+
+        const linkFinal = `https://api.whatsapp.com/send?phone=${MEU_WHATSAPP}&text=${mensagem}`;
+
+        setTimeout(() => {
+            window.location.href = linkFinal;
+        }, 2500); // Espera 2.5 seg pro usuário ver o pop-up bonito
+    });
+</script>
+</body>
+</html>
